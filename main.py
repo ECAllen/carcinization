@@ -5,6 +5,12 @@ client = anthropic.Anthropic()
 conversation_history = []
 
 
+def list_models():
+    models = client.models.list()
+    for model in models.data:
+        print(model.id)
+
+
 def chat_streaming(user_message: str) -> str:
     conversation_history.append({"role": "user", "content": user_message})
 
@@ -44,16 +50,35 @@ def chat(user_message: str) -> str:
     return assistant_message
 
 
+def handle_slash_command(command: str) -> bool:
+    """Returns True if the input was a slash command."""
+    if command == "/clear":
+        conversation_history.clear()
+        print("Conversation cleared.\n")
+    elif command == "/models":
+        list_models()
+    elif command == "/help":
+        print("/clear   - clear conversation history")
+        print("/models  - list available models")
+        print("/help    - show this message")
+        print("/exit    - quit\n")
+    elif command in ("/exit", "/quit"):
+        raise SystemExit
+    else:
+        print(f"Unknown command: {command}\n")
+    return True
+
+
 def main():
-    print("Coding assistant ready. Type 'exit' to quit.\n")
+    print("Coding assistant ready. Type /help for commands.\n")
     while True:
         user_input = input("🧑‍💻 ").strip()
-        if user_input.lower() in ("exit", "quit"):
-            break
         if not user_input:
             continue
-        response = chat_streaming(user_input)
-        print(f"\n🦀 {response}\n")
+        if user_input.startswith("/"):
+            handle_slash_command(user_input)
+            continue
+        chat_streaming(user_input)
 
 
 if __name__ == "__main__":
