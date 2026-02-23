@@ -69,6 +69,31 @@ def handle_slash_command(command: str) -> bool:
     return True
 
 
+############
+## Tools
+############
+
+read_file_tool = {
+    "name": "read_file",
+    "description": "Read the contents of a file at the given path and return them as a string.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "The path to the file to read.",
+            }
+        },
+        "required": ["path"],
+    },
+}
+
+
+def read_file(path: str) -> str:
+    with open(path, "r") as f:
+        return f.read()
+
+
 def main():
     print("Coding assistant ready. Type /help for commands.\n")
     while True:
